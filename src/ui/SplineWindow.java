@@ -21,7 +21,7 @@ public class SplineWindow {
     private static final int WINDOW_HEIGHT = 600;
 
     private JFrame frame;
-    private JPanel panel;
+    private SplinePanel splinePanel;
 
 
     /*--- Constructor ---*/
@@ -64,10 +64,10 @@ public class SplineWindow {
     }
 
     private void initializeViewClasses() {
-        panel = new JPanel();
+        splinePanel = new SplinePanel();
     }
 
     private void addViewClasses() {
-        frame.add(panel, BorderLayout.CENTER);
+        frame.add(splinePanel, BorderLayout.CENTER);
     }
 }
