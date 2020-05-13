@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
 
 /* Spline Interpolator
  * Christopher Cruzen
@@ -24,18 +25,19 @@ class SplinePanel extends JPanel {
     private static final int LINE_WIDTH = 2;
     private static final int POINT_DIAMETER = 6;
     private static final int POINT_OFFSET = 0;
-    private static final Color LINE_COLOR = new Color(160, 160, 160);
+    private static final Color LINE_COLOR = new Color(170, 170, 170);
     private static final Color END_BACKGROUND_COLOR = new Color(70, 100, 255);
     private static final Color END_FOREGROUND_COLOR = END_BACKGROUND_COLOR;
 
     private SplineInterpolator splineInterpolator;
+    private ArrayList<Point> points;
 
 
     /*--- Constructor ---*/
 
     SplinePanel() {
-        this.setBackground(Color.WHITE);
-        this.splineInterpolator = new SplineInterpolator();
+        setBackground(Color.WHITE);
+        splineInterpolator = new SplineInterpolator();
     }
 
 
@@ -51,46 +53,72 @@ class SplinePanel extends JPanel {
         graphics.setColor(LINE_COLOR);
         graphics.setStroke(new BasicStroke(LINE_WIDTH));
 
-        // Calculate Draw Variables
+        // Calculate Draw Dimensions
         int width = this.getSize().width;
         int height = this.getSize().height;
-        Point lineStart = new Point(100, height / 2);
-        Point lineEnd = new Point(width - 100, height / 2);
+
+        // Define Points
+        points = new ArrayList<>();
+        points.add(new Point(100, height / 2));
+        points.add(new Point(width - 100, height / 2));
 
         // Draw Line
-        Line2D line = new Line2D.Float(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+        Line2D line = new Line2D.Float(getFirstPoint().x, getFirstPoint().y, getLastPoint().x, getLastPoint().y);
         graphics.draw(line);
 
-        // Draw End Point Backgrounds
+        // Draw Boundary Point Backgrounds
         graphics.setColor(END_BACKGROUND_COLOR);
         Ellipse2D.Double circle = new Ellipse2D.Double(
-                lineStart.x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                lineStart.y - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                getFirstPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                getFirstPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
                 POINT_DIAMETER,
                 POINT_DIAMETER
         );
         graphics.fill(circle);
         circle = new Ellipse2D.Double(
-                lineEnd.x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                lineEnd.y - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                getLastPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                getLastPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
                 POINT_DIAMETER,
                 POINT_DIAMETER
         );
         graphics.fill(circle);
 
-        // Draw End Point Foregrounds
+        // Draw Boundary Point Foregrounds
         graphics.setColor(END_FOREGROUND_COLOR);
         graphics.drawOval(
-                lineStart.x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                lineStart.y - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                getFirstPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                getFirstPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
                 POINT_DIAMETER,
                 POINT_DIAMETER
         );
         graphics.drawOval(
-                lineEnd.x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                lineEnd.y - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                getLastPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                getLastPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
                 POINT_DIAMETER,
                 POINT_DIAMETER
         );
+        
+        // Draw Returned Points
+        for (Point point : splineInterpolator.getTestPoints(points)) {
+            graphics.setColor(END_FOREGROUND_COLOR);
+            circle = new Ellipse2D.Double(
+                    point.x + POINT_OFFSET,
+                    point.y + POINT_OFFSET,
+                    POINT_DIAMETER,
+                    POINT_DIAMETER
+            );
+            graphics.fill(circle);
+        }
+    }
+
+
+    /*--- Private Methods ---*/
+
+    private Point getFirstPoint() {
+        return points.get(0);
+    }
+
+    private Point getLastPoint() {
+        return points.get(points.size() - 1);
     }
 }
