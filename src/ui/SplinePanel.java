@@ -23,17 +23,18 @@ class SplinePanel extends JPanel {
 
     /*--- Variable Declarations ---*/
 
-    private static final int CURVE_SAMPLES = 20;
+    private static final int CURVE_SAMPLES = 30;
 
-    private static final int LINE_WIDTH = 2;
-    private static final int POINT_DIAMETER = 7;
-    private static final int POINT_DIAMETER_SMALL = 5;
+    private static final int LINE_WIDTH = 3;
+    private static final int POINT_DIAMETER = 9;
+    private static final int POINT_DIAMETER_SMALL = 7;
     private static final int POINT_SELECTION_RANGE = 20;
     private static final int POINT_OFFSET = 0;
     private static final Color LINE_COLOR = new Color(240, 240, 240);
     private static final Color END_POINT_COLOR = new Color(70, 100, 255);
     private static final Color SOURCE_POINT_COLOR = new Color(60, 200, 90);
     private static final Color NEW_POINT_COLOR = new Color(135, 135, 135);
+    private static final Color TEXT_COLOR = new Color(100, 100, 100);
 
     private SplineInterpolator splineInterpolator;
     private int selectedPointIndex;
@@ -103,6 +104,13 @@ class SplinePanel extends JPanel {
         graphics.setColor(END_POINT_COLOR);
         drawPoint(graphics, getFirstPoint());
         drawPoint(graphics, getLastPoint());
+
+        // Draw Text
+        graphics.setColor(TEXT_COLOR);
+        graphics.setFont(new Font("Arial", Font.BOLD, 16));
+        graphics.drawString("Control Points: " + points.size(), 16, getHeight() - 50);
+        graphics.drawString("Curve Samples: " + CURVE_SAMPLES, 16, getHeight() - 20);
+
     }
 
 

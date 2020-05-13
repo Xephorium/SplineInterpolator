@@ -1,5 +1,5 @@
 # Spline Interpolator
-An exercise in B-Spline interpolation between an arbitrary number of points.
+A personal exercise in B-Spline interpolation between an arbitrary number of points.
 
 ### Execution Directions
 - To clean project, execute _clean.bat_.
