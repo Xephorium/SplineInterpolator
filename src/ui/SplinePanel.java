@@ -1,6 +1,5 @@
 package ui;
 
-import math.QuadraticInterpolator;
 import math.SplineInterpolator;
 
 import javax.swing.*;
@@ -23,8 +22,11 @@ class SplinePanel extends JPanel {
 
     /*--- Variable Declarations ---*/
 
+    private static final int CURVE_SAMPLES = 20;
+
     private static final int LINE_WIDTH = 2;
     private static final int POINT_DIAMETER = 7;
+    private static final int POINT_DIAMETER_SMALL = 5;
     private static final int POINT_OFFSET = 0;
     private static final Color LINE_COLOR = new Color(240, 240, 240);
     private static final Color END_POINT_COLOR = new Color(70, 100, 255);
@@ -58,11 +60,11 @@ class SplinePanel extends JPanel {
         int width = this.getSize().width;
         int height = this.getSize().height;
 
-        // Define Points
+        // Define Source Points
         points = new ArrayList<>();
         points.add(new Point(100, height / 2));
-        points.add(new Point((((width - 100) - 100) / 3) + getFirstPoint().x, height / 2 - 100));
-        points.add(new Point((((width - 100) - 100) / 3) * 2 + getFirstPoint().x, height / 2 + 100));
+        points.add(new Point(width / 3, height / 4));
+        points.add(new Point(width - (width / 2), height - (height / 3)));
         points.add(new Point(width - 100, height / 2));
 
         // Draw Source Lines
@@ -82,11 +84,20 @@ class SplinePanel extends JPanel {
         drawPoint(graphics, getFirstPoint());
         drawPoint(graphics, getLastPoint());
         
-        // Draw Returned Points
+        // Draw Interpolated Curve
         graphics.setColor(NEW_POINT_COLOR);
-        for (Point point : splineInterpolator.getTestPoints(points)) {
-            drawPoint(graphics, point);
+        ArrayList<Point> curveSamples = splineInterpolator.getTestPoints(points, CURVE_SAMPLES);
+        drawLine(graphics, points.get(0), curveSamples.get(0));
+        drawLine(graphics, points.get(points.size() - 1), curveSamples.get(curveSamples.size() - 1));
+        for (int x = 0; x < curveSamples.size() - 1; x++) {
+            drawLine(graphics, curveSamples.get(x), curveSamples.get(x + 1));
         }
+        // Draw Interpolated Points
+        graphics.setColor(NEW_POINT_COLOR);
+        for (Point point : curveSamples) {
+            drawSmallPoint(graphics, point);
+        }
+
     }
 
 
@@ -103,6 +114,16 @@ class SplinePanel extends JPanel {
                 point.y - (POINT_DIAMETER / 2) + POINT_OFFSET,
                 POINT_DIAMETER,
                 POINT_DIAMETER
+        );
+        graphics.fill(circle);
+    }
+
+    private void drawSmallPoint(Graphics2D graphics, Point point) {
+        Ellipse2D.Double circle = new Ellipse2D.Double(
+                point.x - (POINT_DIAMETER_SMALL / 2) + POINT_OFFSET,
+                point.y - (POINT_DIAMETER_SMALL / 2) + POINT_OFFSET,
+                POINT_DIAMETER_SMALL,
+                POINT_DIAMETER_SMALL
         );
         graphics.fill(circle);
     }
