@@ -23,11 +23,10 @@ class SplinePanel extends JPanel {
     /*--- Variable Declarations ---*/
 
     private static final int LINE_WIDTH = 2;
-    private static final int POINT_DIAMETER = 6;
+    private static final int POINT_DIAMETER = 7;
     private static final int POINT_OFFSET = 0;
     private static final Color LINE_COLOR = new Color(170, 170, 170);
-    private static final Color END_BACKGROUND_COLOR = new Color(70, 100, 255);
-    private static final Color END_FOREGROUND_COLOR = END_BACKGROUND_COLOR;
+    private static final Color END_POINT_COLOR = new Color(70, 100, 255);
 
     private SplineInterpolator splineInterpolator;
     private ArrayList<Point> points;
@@ -66,8 +65,8 @@ class SplinePanel extends JPanel {
         Line2D line = new Line2D.Float(getFirstPoint().x, getFirstPoint().y, getLastPoint().x, getLastPoint().y);
         graphics.draw(line);
 
-        // Draw Boundary Point Backgrounds
-        graphics.setColor(END_BACKGROUND_COLOR);
+        // Draw Boundary Points
+        graphics.setColor(END_POINT_COLOR);
         Ellipse2D.Double circle = new Ellipse2D.Double(
                 getFirstPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
                 getFirstPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
@@ -82,28 +81,13 @@ class SplinePanel extends JPanel {
                 POINT_DIAMETER
         );
         graphics.fill(circle);
-
-        // Draw Boundary Point Foregrounds
-        graphics.setColor(END_FOREGROUND_COLOR);
-        graphics.drawOval(
-                getFirstPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                getFirstPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                POINT_DIAMETER,
-                POINT_DIAMETER
-        );
-        graphics.drawOval(
-                getLastPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                getLastPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                POINT_DIAMETER,
-                POINT_DIAMETER
-        );
         
         // Draw Returned Points
+        graphics.setColor(LINE_COLOR);
         for (Point point : splineInterpolator.getTestPoints(points)) {
-            graphics.setColor(END_FOREGROUND_COLOR);
             circle = new Ellipse2D.Double(
-                    point.x + POINT_OFFSET,
-                    point.y + POINT_OFFSET,
+                    point.x - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                    point.y - (POINT_DIAMETER / 2) + POINT_OFFSET,
                     POINT_DIAMETER,
                     POINT_DIAMETER
             );
