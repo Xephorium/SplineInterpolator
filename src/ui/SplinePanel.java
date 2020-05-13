@@ -26,7 +26,7 @@ class SplinePanel extends JPanel {
     private static final int CURVE_SAMPLES = 30;
 
     private static final int LINE_WIDTH = 3;
-    private static final int POINT_DIAMETER = 9;
+    private static final int POINT_DIAMETER = 11;
     private static final int POINT_DIAMETER_SMALL = 7;
     private static final int POINT_SELECTION_RANGE = 20;
     private static final int POINT_OFFSET = 0;
