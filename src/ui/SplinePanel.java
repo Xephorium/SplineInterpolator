@@ -31,7 +31,7 @@ class SplinePanel extends JPanel {
     private static final int POINT_SELECTION_RANGE = 20;
     private static final int POINT_OFFSET = 0;
     private static final Color LINE_COLOR = new Color(240, 240, 240);
-    private static final Color END_POINT_COLOR = new Color(70, 100, 255);
+    private static final Color END_POINT_COLOR = new Color(80, 130, 255);
     private static final Color SOURCE_POINT_COLOR = new Color(60, 200, 90);
     private static final Color NEW_POINT_COLOR = new Color(135, 135, 135);
     private static final Color TEXT_COLOR = new Color(100, 100, 100);
@@ -56,10 +56,10 @@ class SplinePanel extends JPanel {
 
         // Initialize Control Points
         points = new ArrayList<>();
-        points.add(new Point(200, 400));
+        points.add(new Point(200, 350));
         points.add(new Point(450, 200));
         points.add(new Point(750, 600));
-        points.add(new Point(1000, 400));
+        points.add(new Point(1000, 450));
     }
 
 
