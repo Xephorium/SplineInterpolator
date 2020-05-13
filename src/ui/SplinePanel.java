@@ -3,7 +3,9 @@ package ui;
 import math.SplineInterpolator;
 
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -12,9 +14,8 @@ import java.util.ArrayList;
  * Christopher Cruzen
  * 05.12.2020
  *
- *   SplinePanel is visual backbone of Spline Interpolator. It manages curve rendering,
- * requesting a variable number of point samples from the SplineInterpolator class to
- * display.
+ *   SplinePanel is visual backbone of Spline Interpolator. It handles curve
+ * rendering and user interactions.
  */
 
 class SplinePanel extends JPanel {
@@ -27,6 +28,7 @@ class SplinePanel extends JPanel {
     private static final int LINE_WIDTH = 2;
     private static final int POINT_DIAMETER = 7;
     private static final int POINT_DIAMETER_SMALL = 5;
+    private static final int POINT_SELECTION_RANGE = 20;
     private static final int POINT_OFFSET = 0;
     private static final Color LINE_COLOR = new Color(240, 240, 240);
     private static final Color END_POINT_COLOR = new Color(70, 100, 255);
@@ -34,14 +36,29 @@ class SplinePanel extends JPanel {
     private static final Color NEW_POINT_COLOR = new Color(135, 135, 135);
 
     private SplineInterpolator splineInterpolator;
+    private int selectedPointIndex;
+    private boolean isPointSelected;
+    private Point selectionStartPosition;
     private ArrayList<Point> points;
 
 
     /*--- Constructor ---*/
 
     SplinePanel() {
+
+        // Configure UI
         setBackground(Color.WHITE);
+        setupMouseListeners();
+
+        // Initialize Fields
         splineInterpolator = new SplineInterpolator();
+
+        // Initialize Control Points
+        points = new ArrayList<>();
+        points.add(new Point(200, 400));
+        points.add(new Point(450, 200));
+        points.add(new Point(750, 600));
+        points.add(new Point(1000, 400));
     }
 
 
@@ -56,17 +73,6 @@ class SplinePanel extends JPanel {
         graphics.setStroke(new BasicStroke(LINE_WIDTH));
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Calculate Draw Dimensions
-        int width = this.getSize().width;
-        int height = this.getSize().height;
-
-        // Define Source Points
-        points = new ArrayList<>();
-        points.add(new Point(100, height / 2));
-        points.add(new Point(width / 3, height / 4));
-        points.add(new Point(width - (width / 2), height - (height / 3)));
-        points.add(new Point(width - 100, height / 2));
-
         // Draw Source Lines
         graphics.setColor(LINE_COLOR);
         for (int x = 0; x < points.size() - 1; x++) {
@@ -78,11 +84,6 @@ class SplinePanel extends JPanel {
         for (Point point : points) {
             drawPoint(graphics, point);
         }
-
-        // Draw Boundary Points
-        graphics.setColor(END_POINT_COLOR);
-        drawPoint(graphics, getFirstPoint());
-        drawPoint(graphics, getLastPoint());
         
         // Draw Interpolated Curve
         graphics.setColor(NEW_POINT_COLOR);
@@ -98,10 +99,14 @@ class SplinePanel extends JPanel {
             drawSmallPoint(graphics, point);
         }
 
+        // Draw Boundary Points
+        graphics.setColor(END_POINT_COLOR);
+        drawPoint(graphics, getFirstPoint());
+        drawPoint(graphics, getLastPoint());
     }
 
 
-    /*--- Private Methods ---*/
+    /*--- Private Data Methods ---*/
 
     private void drawLine(Graphics2D graphics, Point start, Point end) {
         Line2D line = new Line2D.Float(start.x, start.y, end.x, end.y);
@@ -134,5 +139,84 @@ class SplinePanel extends JPanel {
 
     private Point getLastPoint() {
         return points.get(points.size() - 1);
+    }
+
+
+    /*--- Private UI Methods ---*/
+
+    private void setupMouseListeners() {
+        MouseInputAdapter mouseClickAdapter = new MouseInputAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+
+                // Get Selected Point
+                Integer index = selectPointIndex(e.getPoint());
+
+                // If Point Selected, Update State
+                if (!isPointSelected && index != null) {
+                    isPointSelected = true;
+                    selectedPointIndex = index;
+                    selectionStartPosition = e.getPoint();
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                isPointSelected = false;
+            }
+        };
+        MouseInputAdapter mouseDragAdapter = new MouseInputAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                super.mouseDragged(e);
+                if (isPointSelected) {
+
+                    // Calculate New Position
+                    int differenceX = e.getX() - selectionStartPosition.x;
+                    int differenceY = e.getY() - selectionStartPosition.y;
+                    int newPositionX = selectionStartPosition.x + differenceX;
+                    int newPositionY = selectionStartPosition.y + differenceY;
+
+                    // Perform Bounds Check
+                    if (newPositionX > getWidth()) newPositionX = getWidth();
+                    if (newPositionX < 0) newPositionX = 0;
+                    if (newPositionY > getHeight()) newPositionY = getHeight();
+                    if (newPositionY < 0) newPositionY = 0;
+
+                    // Update Position
+                    points.get(selectedPointIndex).x = newPositionX;
+                    points.get(selectedPointIndex).y = newPositionY;
+
+                    repaint();
+                }
+            }
+        };
+        this.addMouseListener(mouseClickAdapter);
+        this.addMouseMotionListener(mouseDragAdapter);
+    }
+
+    private Integer selectPointIndex(Point position) {
+
+        // Declare Local Variables
+        double distance = 1000000; // Arbitrarily High Number
+        int index = 0;
+
+        // Find Nearest Point
+        for (int x = 0; x < points.size(); x++) {
+            double pointDistance = points.get(x).distance(position);
+            if (pointDistance < distance) {
+                distance = pointDistance;
+                index = x;
+            }
+        }
+
+        // Return Point If In Range
+        if (points.get(index).distance(position) < POINT_SELECTION_RANGE) {
+            return index;
+        } else {
+            return null;
+        }
     }
 }
