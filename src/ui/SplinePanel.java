@@ -1,5 +1,6 @@
 package ui;
 
+import math.QuadraticInterpolator;
 import math.SplineInterpolator;
 
 import javax.swing.*;
@@ -25,8 +26,10 @@ class SplinePanel extends JPanel {
     private static final int LINE_WIDTH = 2;
     private static final int POINT_DIAMETER = 7;
     private static final int POINT_OFFSET = 0;
-    private static final Color LINE_COLOR = new Color(170, 170, 170);
+    private static final Color LINE_COLOR = new Color(240, 240, 240);
     private static final Color END_POINT_COLOR = new Color(70, 100, 255);
+    private static final Color SOURCE_POINT_COLOR = new Color(60, 200, 90);
+    private static final Color NEW_POINT_COLOR = new Color(135, 135, 135);
 
     private SplineInterpolator splineInterpolator;
     private ArrayList<Point> points;
@@ -58,11 +61,21 @@ class SplinePanel extends JPanel {
         // Define Points
         points = new ArrayList<>();
         points.add(new Point(100, height / 2));
+        points.add(new Point((((width - 100) - 100) / 3) + getFirstPoint().x, height / 2 - 100));
+        points.add(new Point((((width - 100) - 100) / 3) * 2 + getFirstPoint().x, height / 2 + 100));
         points.add(new Point(width - 100, height / 2));
 
-        // Draw Line
+        // Draw Source Lines
         graphics.setColor(LINE_COLOR);
-        drawLine(graphics, getFirstPoint(), getLastPoint());
+        for (int x = 0; x < points.size() - 1; x++) {
+            drawLine(graphics, points.get(x), points.get(x + 1));
+        }
+
+        // Draw Source Points
+        graphics.setColor(SOURCE_POINT_COLOR);
+        for (Point point : points) {
+            drawPoint(graphics, point);
+        }
 
         // Draw Boundary Points
         graphics.setColor(END_POINT_COLOR);
@@ -70,7 +83,7 @@ class SplinePanel extends JPanel {
         drawPoint(graphics, getLastPoint());
         
         // Draw Returned Points
-        graphics.setColor(LINE_COLOR);
+        graphics.setColor(NEW_POINT_COLOR);
         for (Point point : splineInterpolator.getTestPoints(points)) {
             drawPoint(graphics, point);
         }

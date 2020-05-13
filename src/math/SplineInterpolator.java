@@ -24,7 +24,19 @@ public class SplineInterpolator {
     /*--- Public Methods ---*/
 
     public ArrayList<Point> getTestPoints(ArrayList<Point> points) {
-        return getDivisionPoints(points, 10);
+
+        // Declare Local Variables
+        QuadraticInterpolator quadInterpolator = new QuadraticInterpolator(points);
+        ArrayList<Point> newPoints = new ArrayList<>();
+
+        // Draw Interpolated Points
+        int divisions = 30;
+        for (int x = 1; x < divisions + 1; x++) {
+            double factor = (double) x / (divisions + 1);
+            newPoints.add(quadInterpolator.getPoint(factor));
+        }
+
+        return newPoints;
     }
 
 
