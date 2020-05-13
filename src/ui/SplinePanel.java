@@ -94,6 +94,7 @@ class SplinePanel extends JPanel {
         for (int x = 0; x < curveSamples.size() - 1; x++) {
             drawLine(graphics, curveSamples.get(x), curveSamples.get(x + 1));
         }
+
         // Draw Interpolated Points
         graphics.setColor(NEW_POINT_COLOR);
         for (Point point : curveSamples) {

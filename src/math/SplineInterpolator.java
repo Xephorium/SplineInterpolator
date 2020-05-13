@@ -29,7 +29,7 @@ public class SplineInterpolator {
         QuadraticInterpolator quadInterpolator = new QuadraticInterpolator(points);
         ArrayList<Point> newPoints = new ArrayList<>();
 
-        // Draw Interpolated Points
+        // Calculate Interpolated Points
         for (int x = 1; x < divisions + 1; x++) {
             double factor = (double) x / (divisions + 1);
             newPoints.add(quadInterpolator.getPoint(factor));
