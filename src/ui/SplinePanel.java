@@ -67,36 +67,28 @@ class SplinePanel extends JPanel {
 
         // Draw Boundary Points
         graphics.setColor(END_POINT_COLOR);
-        Ellipse2D.Double circle = new Ellipse2D.Double(
-                getFirstPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                getFirstPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                POINT_DIAMETER,
-                POINT_DIAMETER
-        );
-        graphics.fill(circle);
-        circle = new Ellipse2D.Double(
-                getLastPoint().x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                getLastPoint().y - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                POINT_DIAMETER,
-                POINT_DIAMETER
-        );
-        graphics.fill(circle);
+        drawPoint(graphics, getFirstPoint());
+        drawPoint(graphics, getLastPoint());
         
         // Draw Returned Points
         graphics.setColor(LINE_COLOR);
         for (Point point : splineInterpolator.getTestPoints(points)) {
-            circle = new Ellipse2D.Double(
-                    point.x - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                    point.y - (POINT_DIAMETER / 2) + POINT_OFFSET,
-                    POINT_DIAMETER,
-                    POINT_DIAMETER
-            );
-            graphics.fill(circle);
+            drawPoint(graphics, point);
         }
     }
 
 
     /*--- Private Methods ---*/
+
+    private void drawPoint(Graphics2D graphics, Point point) {
+        Ellipse2D.Double circle = new Ellipse2D.Double(
+                point.x - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                point.y - (POINT_DIAMETER / 2) + POINT_OFFSET,
+                POINT_DIAMETER,
+                POINT_DIAMETER
+        );
+        graphics.fill(circle);
+    }
 
     private Point getFirstPoint() {
         return points.get(0);
