@@ -48,9 +48,8 @@ class SplinePanel extends JPanel {
 
         // Setup 2D Graphics
         Graphics2D graphics = (Graphics2D) g;
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics.setColor(LINE_COLOR);
         graphics.setStroke(new BasicStroke(LINE_WIDTH));
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Calculate Draw Dimensions
         int width = this.getSize().width;
@@ -62,8 +61,8 @@ class SplinePanel extends JPanel {
         points.add(new Point(width - 100, height / 2));
 
         // Draw Line
-        Line2D line = new Line2D.Float(getFirstPoint().x, getFirstPoint().y, getLastPoint().x, getLastPoint().y);
-        graphics.draw(line);
+        graphics.setColor(LINE_COLOR);
+        drawLine(graphics, getFirstPoint(), getLastPoint());
 
         // Draw Boundary Points
         graphics.setColor(END_POINT_COLOR);
@@ -79,6 +78,11 @@ class SplinePanel extends JPanel {
 
 
     /*--- Private Methods ---*/
+
+    private void drawLine(Graphics2D graphics, Point start, Point end) {
+        Line2D line = new Line2D.Float(start.x, start.y, end.x, end.y);
+        graphics.draw(line);
+    }
 
     private void drawPoint(Graphics2D graphics, Point point) {
         Ellipse2D.Double circle = new Ellipse2D.Double(
