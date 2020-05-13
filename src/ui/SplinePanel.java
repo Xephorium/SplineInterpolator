@@ -27,7 +27,7 @@ class SplinePanel extends JPanel {
 
     private static final int LINE_WIDTH = 3;
     private static final int POINT_DIAMETER = 11;
-    private static final int POINT_DIAMETER_SMALL = 7;
+    private static final int POINT_DIAMETER_SMALL = 5;
     private static final int POINT_SELECTION_RANGE = 20;
     private static final int POINT_OFFSET = 0;
     private static final Color LINE_COLOR = new Color(240, 240, 240);
@@ -95,7 +95,7 @@ class SplinePanel extends JPanel {
             drawLine(graphics, curveSamples.get(x), curveSamples.get(x + 1));
         }
 
-        // Draw Interpolated Points
+        // Draw Sample Points
         graphics.setColor(NEW_POINT_COLOR);
         for (Point point : curveSamples) {
             drawSmallPoint(graphics, point);
