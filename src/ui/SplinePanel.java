@@ -51,15 +51,13 @@ class SplinePanel extends JPanel {
         setBackground(Color.WHITE);
         setupMouseListeners();
 
-        // Initialize Fields
-        splineInterpolator = new SplineInterpolator();
-
         // Initialize Control Points
         points = new ArrayList<>();
-        points.add(new Point(200, 350));
-        points.add(new Point(450, 200));
-        points.add(new Point(750, 600));
-        points.add(new Point(1000, 450));
+        points.add(new Point(100, 350));
+        points.add(new Point(350, 550));
+        points.add(new Point(600, 250));
+        points.add(new Point(850, 550));
+        points.add(new Point(1100, 350));
     }
 
 
@@ -85,10 +83,12 @@ class SplinePanel extends JPanel {
         for (Point point : points) {
             drawPoint(graphics, point);
         }
+
+        // Generate Interpolated Points
+        ArrayList<Point> curveSamples = getCurveSamplePoints(points, CURVE_SAMPLES);
         
         // Draw Interpolated Curve
         graphics.setColor(NEW_POINT_COLOR);
-        ArrayList<Point> curveSamples = splineInterpolator.getTestPoints(points, CURVE_SAMPLES);
         drawLine(graphics, points.get(0), curveSamples.get(0));
         drawLine(graphics, points.get(points.size() - 1), curveSamples.get(curveSamples.size() - 1));
         for (int x = 0; x < curveSamples.size() - 1; x++) {
@@ -117,6 +117,32 @@ class SplinePanel extends JPanel {
 
     /*--- Private Data Methods ---*/
 
+    private ArrayList<Point> getCurveSamplePoints(ArrayList<Point> points, int divisions) {
+
+        // Declare Local Variables
+        splineInterpolator = new SplineInterpolator(points);
+        ArrayList<Point> newPoints = new ArrayList<>();
+
+        // Retrieve Interpolated Points
+        for (int x = 1; x < divisions + 1; x++) {
+            double factor = (double) x / (divisions + 1);
+            newPoints.add(splineInterpolator.getPoint(factor));
+        }
+
+        return newPoints;
+    }
+
+    private Point getFirstPoint() {
+        return points.get(0);
+    }
+
+    private Point getLastPoint() {
+        return points.get(points.size() - 1);
+    }
+
+
+    /*--- Private UI Methods ---*/
+
     private void drawLine(Graphics2D graphics, Point start, Point end) {
         Line2D line = new Line2D.Float(start.x, start.y, end.x, end.y);
         graphics.draw(line);
@@ -141,17 +167,6 @@ class SplinePanel extends JPanel {
         );
         graphics.fill(circle);
     }
-
-    private Point getFirstPoint() {
-        return points.get(0);
-    }
-
-    private Point getLastPoint() {
-        return points.get(points.size() - 1);
-    }
-
-
-    /*--- Private UI Methods ---*/
 
     private void setupMouseListeners() {
         MouseInputAdapter mouseClickAdapter = new MouseInputAdapter() {
