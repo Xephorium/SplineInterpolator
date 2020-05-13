@@ -49,12 +49,19 @@ public class SplineInterpolator {
         ArrayList<Point> divisionPoints = new ArrayList<>();
         for (int x = 0; x < divisions - 1; x++) {
             double interpolationFactor = (x + 1.0) * (1.0 / divisions);
-            divisionPoints.add(new Point(
-                    (int) (lastPoint.x * interpolationFactor + firstPoint.x * (1.0 - interpolationFactor)),
-                    (int) (lastPoint.y * interpolationFactor + firstPoint.y * (1.0 - interpolationFactor))
-            ));
+            divisionPoints.add(linearlyInterpolatePoints(firstPoint, lastPoint, interpolationFactor));
         }
 
         return divisionPoints;
+    }
+
+    /* Note: This method performs linear interpolation between the two passed points,
+     *       returning the location factor/1.0 of the way between them.
+     */
+    private Point linearlyInterpolatePoints(Point pointOne, Point pointTwo, double factor) {
+        return new Point(
+                (int) (pointTwo.x * factor + pointOne.x * (1.0 - factor)),
+                (int) (pointTwo.y * factor + pointOne.y * (1.0 - factor))
+        );
     }
 }
