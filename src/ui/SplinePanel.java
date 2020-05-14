@@ -35,11 +35,15 @@ class SplinePanel extends JPanel {
     private static final int POINT_DIAMETER_SMALL = 5;
     private static final int POINT_SELECTION_RANGE = 20;
     private static final int POINT_OFFSET = 0;
-    private static final Color LINE_COLOR = new Color(240, 240, 240);
+    private static final int BACKGROUND_LIGHT = 255;
+    private static final int BACKGROUND_DARK = 235;
+    private static final int BACKGROUND_STRIP_HEIGHT = 20;
+    private static final Color LINE_COLOR = new Color(210, 210, 210);
     private static final Color END_POINT_COLOR = new Color(80, 130, 255);
-    private static final Color SOURCE_POINT_COLOR = new Color(60, 200, 90);
+    private static final Color CONTROL_POINT_COLOR = new Color(60, 200, 90);
     private static final Color ANIMATED_POINT_COLOR = new Color(255, 110, 100);
-    private static final Color NEW_POINT_COLOR = new Color(135, 135, 135);
+    private static final Color INTERPOLATED_POINT_COLOR = new Color(125, 125, 125);
+    private static final Color INTERPOLATED_LINE_COLOR = new Color(125, 125, 125);
     private static final Color TEXT_COLOR = new Color(100, 100, 100);
 
     // Variables
@@ -48,7 +52,7 @@ class SplinePanel extends JPanel {
     private int selectedPointIndex;
     private boolean isPointSelected;
     private Point selectionStartPosition;
-    private ArrayList<Point> points;
+    private ArrayList<Point> controlPoints;
 
 
     /*--- Constructor ---*/
@@ -63,12 +67,12 @@ class SplinePanel extends JPanel {
         setupMouseListeners();
 
         // Initialize Control Points
-        points = new ArrayList<>();
-        points.add(new Point(100, 350));
-        points.add(new Point(350, 550));
-        points.add(new Point(600, 250));
-        points.add(new Point(850, 550));
-        points.add(new Point(1100, 350));
+        controlPoints = new ArrayList<>();
+        controlPoints.add(new Point(100, 350));
+        controlPoints.add(new Point(350, 550));
+        controlPoints.add(new Point(600, 250));
+        controlPoints.add(new Point(850, 550));
+        controlPoints.add(new Point(1100, 350));
     }
 
 
@@ -80,38 +84,49 @@ class SplinePanel extends JPanel {
 
         // Setup 2D Graphics
         Graphics2D graphics = (Graphics2D) g;
-        graphics.setStroke(new BasicStroke(LINE_WIDTH));
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Draw Source Lines
-        graphics.setColor(LINE_COLOR);
-        for (int x = 0; x < points.size() - 1; x++) {
-            drawLine(graphics, points.get(x), points.get(x + 1));
+        // Draw Background
+        double color = BACKGROUND_DARK;
+        double colorDiff = BACKGROUND_LIGHT - BACKGROUND_DARK;
+        graphics.setStroke(new BasicStroke(BACKGROUND_STRIP_HEIGHT));
+        for (int y = 0; y < getHeight(); y += BACKGROUND_STRIP_HEIGHT - 1) {
+            graphics.setColor(new Color((int) color, (int) color, (int) color));
+            Line2D line = new Line2D.Float(0, y, getWidth(), y);
+            graphics.draw(line);
+            color += (colorDiff / (getHeight())) * (BACKGROUND_STRIP_HEIGHT - 1);
         }
 
-        // Draw Source Points
-        graphics.setColor(SOURCE_POINT_COLOR);
-        for (Point point : points) {
+        // Draw Control Lines
+        graphics.setColor(LINE_COLOR);
+        graphics.setStroke(new BasicStroke(LINE_WIDTH));
+        for (int x = 0; x < controlPoints.size() - 1; x++) {
+            drawLine(graphics, controlPoints.get(x), controlPoints.get(x + 1));
+        }
+
+        // Draw Control Points
+        graphics.setColor(CONTROL_POINT_COLOR);
+        for (Point point : controlPoints) {
             drawPoint(graphics, point);
         }
 
         // Generate Interpolated Points
-        ArrayList<Point> curveSamples = getCurveSamplePoints(points, CURVE_SAMPLES);
+        ArrayList<Point> curveSamples = getCurveSamplePoints(controlPoints, CURVE_SAMPLES);
 
         // Generate Animated Point
         Point animatedPoint;
         if (SHOW_ANIMATED_POINT) animatedPoint = getCurveAnimatedPoint();
         
         // Draw Interpolated Curve
-        graphics.setColor(NEW_POINT_COLOR);
-        drawLine(graphics, points.get(0), curveSamples.get(0));
-        drawLine(graphics, points.get(points.size() - 1), curveSamples.get(curveSamples.size() - 1));
+        graphics.setColor(INTERPOLATED_LINE_COLOR);
+        drawLine(graphics, controlPoints.get(0), curveSamples.get(0));
+        drawLine(graphics, controlPoints.get(controlPoints.size() - 1), curveSamples.get(curveSamples.size() - 1));
         for (int x = 0; x < curveSamples.size() - 1; x++) {
             drawLine(graphics, curveSamples.get(x), curveSamples.get(x + 1));
         }
 
-        // Draw Sample Points
-        graphics.setColor(NEW_POINT_COLOR);
+        // Draw Interpolated Points
+        graphics.setColor(INTERPOLATED_POINT_COLOR);
         for (Point point : curveSamples) {
             drawSmallPoint(graphics, point);
         }
@@ -128,7 +143,7 @@ class SplinePanel extends JPanel {
         // Draw Text
         graphics.setColor(TEXT_COLOR);
         graphics.setFont(new Font("Arial", Font.BOLD, 16));
-        graphics.drawString("Control Points: " + points.size(), 16, getHeight() - 50);
+        graphics.drawString("Control Points: " + controlPoints.size(), 16, getHeight() - 50);
         graphics.drawString("Curve Samples: " + CURVE_SAMPLES, 16, getHeight() - 20);
 
         if (SHOW_ANIMATED_POINT) repaint();
@@ -163,11 +178,11 @@ class SplinePanel extends JPanel {
     }
 
     private Point getFirstPoint() {
-        return points.get(0);
+        return controlPoints.get(0);
     }
 
     private Point getLastPoint() {
-        return points.get(points.size() - 1);
+        return controlPoints.get(controlPoints.size() - 1);
     }
 
 
@@ -240,8 +255,8 @@ class SplinePanel extends JPanel {
                     if (newPositionY < 0) newPositionY = 0;
 
                     // Update Position
-                    points.get(selectedPointIndex).x = newPositionX;
-                    points.get(selectedPointIndex).y = newPositionY;
+                    controlPoints.get(selectedPointIndex).x = newPositionX;
+                    controlPoints.get(selectedPointIndex).y = newPositionY;
 
                     repaint();
                 }
@@ -258,8 +273,8 @@ class SplinePanel extends JPanel {
         int index = 0;
 
         // Find Nearest Point
-        for (int x = 0; x < points.size(); x++) {
-            double pointDistance = points.get(x).distance(position);
+        for (int x = 0; x < controlPoints.size(); x++) {
+            double pointDistance = controlPoints.get(x).distance(position);
             if (pointDistance < distance) {
                 distance = pointDistance;
                 index = x;
@@ -267,7 +282,7 @@ class SplinePanel extends JPanel {
         }
 
         // Return Point If In Range
-        if (points.get(index).distance(position) < POINT_SELECTION_RANGE) {
+        if (controlPoints.get(index).distance(position) < POINT_SELECTION_RANGE) {
             return index;
         } else {
             return null;
