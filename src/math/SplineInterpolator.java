@@ -46,13 +46,51 @@ public class SplineInterpolator {
     }
 
 
-    /*--- Public Methods ---*/
+    /*--- Public Instance Methods ---*/
 
-    public Point getPoint(double factor) {
+    public Point getInterpolatedPoint(double factor) {
         return new Point(
                 (int) calculateInterpolatedValue(xValues, factor),
                 (int) calculateInterpolatedValue(yValues, factor)
         );
+    }
+
+
+    /*--- Public Static Methods ---*/
+
+    /* Note: This method imagines a line between the first and last points
+     *       it is passed. It then divides that line into a variable number
+     *       of segments and returns the "division" points. This is
+     *       shown in the diagram below, with p(0)/p(N) representing the first
+     *       and last input points and d(0)/d(N) representing the division points.
+     *
+     *       p(0)-------d(0)--...--d(N)-------p(N)
+     *
+     */
+    public static ArrayList<Point> getDivisionPoints(ArrayList<Point> points, int divisions) {
+
+        // Declare Local Variables
+        Point firstPoint = points.get(0);
+        Point lastPoint = points.get(points.size() - 1);
+
+        // Calculate Division Points
+        ArrayList<Point> divisionPoints = new ArrayList<>();
+        for (int x = 0; x < divisions - 1; x++) {
+            double interpolationFactor = (x + 1.0) * (1.0 / divisions);
+            divisionPoints.add(new Point(
+                    (int) (linearlyInterpolateValues(lastPoint.x, firstPoint.x, interpolationFactor)),
+                    (int) (linearlyInterpolateValues(lastPoint.y, firstPoint.y, interpolationFactor))
+            ));
+        }
+
+        return divisionPoints;
+    }
+
+    /* Note: This method performs linear interpolation between the two passed values,
+     *       returning the location (factor/1.0) of the way between them.
+     */
+    public static double linearlyInterpolateValues(double pointOne, double pointTwo, double factor) {
+        return pointOne * factor + pointTwo * (1.0 - factor);
     }
 
 
@@ -74,15 +112,5 @@ public class SplineInterpolator {
             }
         }
         return(matrix[pointCount - 1][0]);
-    }
-
-
-    /*--- Private Mathematical Methods ---*/
-
-    /* Note: This method performs linear interpolation between the two passed values,
-     *       returning the location (factor/1.0) of the way between them.
-     */
-    private double linearlyInterpolateValues(double pointOne, double pointTwo, double factor) {
-        return pointOne * factor + pointTwo * (1.0 - factor);
     }
 }

@@ -28,6 +28,7 @@ class SplinePanel extends JPanel {
     private static final boolean SHOW_ANIMATED_POINT = true;
     private static final int LOOP_LENGTH = 10000;
     private static final int CURVE_SAMPLES = 30;
+    private static final int CONTROL_POINTS = 6;
 
     // Interface Constants
     private static final int LINE_WIDTH = 3;
@@ -68,11 +69,18 @@ class SplinePanel extends JPanel {
 
         // Initialize Control Points
         controlPoints = new ArrayList<>();
-        controlPoints.add(new Point(100, 350));
-        controlPoints.add(new Point(350, 550));
-        controlPoints.add(new Point(600, 250));
-        controlPoints.add(new Point(850, 550));
-        controlPoints.add(new Point(1100, 350));
+        controlPoints.add(new Point(70, 390));
+        controlPoints.add(new Point(1100, 390));
+        ArrayList<Point> innerControlPoints = SplineInterpolator.getDivisionPoints(controlPoints, CONTROL_POINTS - 1);
+        controlPoints.remove(controlPoints.size() - 1);
+        for (int x = 0; x < innerControlPoints.size(); x++) {
+            double factor = (x + 1) * (1 / ((double) innerControlPoints.size() + 1));
+            controlPoints.add(new Point(
+                    innerControlPoints.get(x).x,
+                    innerControlPoints.get(x).y + getInitialControlPointOffset(factor)
+            ));
+        }
+        controlPoints.add(new Point(1110, 390));
     }
 
 
@@ -161,7 +169,7 @@ class SplinePanel extends JPanel {
         // Retrieve Interpolated Points
         for (int x = 1; x < divisions + 1; x++) {
             double factor = (double) x / (divisions + 1);
-            newPoints.add(splineInterpolator.getPoint(factor));
+            newPoints.add(splineInterpolator.getInterpolatedPoint(factor));
         }
 
         return newPoints;
@@ -174,7 +182,7 @@ class SplinePanel extends JPanel {
         double factor = ((time - startTime) % LOOP_LENGTH) / (double) LOOP_LENGTH;
 
         // Return Animated Point
-        return splineInterpolator.getPoint(factor);
+        return splineInterpolator.getInterpolatedPoint(factor);
     }
 
     private Point getFirstPoint() {
@@ -183,6 +191,10 @@ class SplinePanel extends JPanel {
 
     private Point getLastPoint() {
         return controlPoints.get(controlPoints.size() - 1);
+    }
+
+    private int getInitialControlPointOffset(double factor) {
+        return (int) (100 * Math.sin(2 * Math.PI * factor));
     }
 
 
