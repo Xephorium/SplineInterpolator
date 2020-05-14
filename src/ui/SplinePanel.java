@@ -69,8 +69,8 @@ class SplinePanel extends JPanel {
 
         // Initialize Control Points
         controlPoints = new ArrayList<>();
-        controlPoints.add(new Point(70, 390));
-        controlPoints.add(new Point(1100, 390));
+        controlPoints.add(new Point(100, 100));
+        controlPoints.add(new Point(1080, 660));
         ArrayList<Point> innerControlPoints = SplineInterpolator.getDivisionPoints(controlPoints, CONTROL_POINTS - 1);
         controlPoints.remove(controlPoints.size() - 1);
         for (int x = 0; x < innerControlPoints.size(); x++) {
@@ -80,7 +80,7 @@ class SplinePanel extends JPanel {
                     innerControlPoints.get(x).y + getInitialControlPointOffset(factor)
             ));
         }
-        controlPoints.add(new Point(1110, 390));
+        controlPoints.add(new Point(1080, 660));
     }
 
 
@@ -194,7 +194,7 @@ class SplinePanel extends JPanel {
     }
 
     private int getInitialControlPointOffset(double factor) {
-        return (int) (100 * Math.sin(2 * Math.PI * factor));
+        return (int) (250 * Math.sin(2 * Math.PI * factor));
     }
 
 
