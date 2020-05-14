@@ -28,7 +28,7 @@ class SplinePanel extends JPanel {
     private static final boolean SHOW_ANIMATED_POINT = true;
     private static final int LOOP_LENGTH = 10000;
     private static final int CURVE_SAMPLES = 30;
-    private static final int CONTROL_POINTS = 6;
+    private static final int CONTROL_POINTS = 5;
 
     // Interface Constants
     private static final int LINE_WIDTH = 3;
@@ -112,19 +112,13 @@ class SplinePanel extends JPanel {
             drawLine(graphics, controlPoints.get(x), controlPoints.get(x + 1));
         }
 
-        // Draw Control Points
-        graphics.setColor(CONTROL_POINT_COLOR);
-        for (Point point : controlPoints) {
-            drawPoint(graphics, point);
-        }
-
         // Generate Interpolated Points
         ArrayList<Point> curveSamples = getCurveSamplePoints(controlPoints, CURVE_SAMPLES);
 
         // Generate Animated Point
         Point animatedPoint;
         if (SHOW_ANIMATED_POINT) animatedPoint = getCurveAnimatedPoint();
-        
+
         // Draw Interpolated Curve
         graphics.setColor(INTERPOLATED_LINE_COLOR);
         drawLine(graphics, controlPoints.get(0), curveSamples.get(0));
@@ -142,6 +136,12 @@ class SplinePanel extends JPanel {
         // Draw Animated Point
         graphics.setColor(ANIMATED_POINT_COLOR);
         if (SHOW_ANIMATED_POINT) drawPoint(graphics, animatedPoint);
+
+        // Draw Control Points
+        graphics.setColor(CONTROL_POINT_COLOR);
+        for (Point point : controlPoints) {
+            drawPoint(graphics, point);
+        }
 
         // Draw Boundary Points
         graphics.setColor(END_POINT_COLOR);
