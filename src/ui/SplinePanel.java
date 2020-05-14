@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Date;
 
 /* Spline Interpolator
  * Christopher Cruzen
@@ -23,8 +24,12 @@ class SplinePanel extends JPanel {
 
     /*--- Variable Declarations ---*/
 
+    // State Constants
+    private static final boolean SHOW_ANIMATED_POINT = true;
+    private static final int LOOP_LENGTH = 10000;
     private static final int CURVE_SAMPLES = 30;
 
+    // Interface Constants
     private static final int LINE_WIDTH = 3;
     private static final int POINT_DIAMETER = 11;
     private static final int POINT_DIAMETER_SMALL = 5;
@@ -33,9 +38,12 @@ class SplinePanel extends JPanel {
     private static final Color LINE_COLOR = new Color(240, 240, 240);
     private static final Color END_POINT_COLOR = new Color(80, 130, 255);
     private static final Color SOURCE_POINT_COLOR = new Color(60, 200, 90);
+    private static final Color ANIMATED_POINT_COLOR = new Color(255, 110, 100);
     private static final Color NEW_POINT_COLOR = new Color(135, 135, 135);
     private static final Color TEXT_COLOR = new Color(100, 100, 100);
 
+    // Variables
+    private long startTime;
     private SplineInterpolator splineInterpolator;
     private int selectedPointIndex;
     private boolean isPointSelected;
@@ -46,6 +54,9 @@ class SplinePanel extends JPanel {
     /*--- Constructor ---*/
 
     SplinePanel() {
+
+        // Initialize Variables
+        startTime = (new Date()).getTime();
 
         // Configure UI
         setBackground(Color.WHITE);
@@ -86,6 +97,10 @@ class SplinePanel extends JPanel {
 
         // Generate Interpolated Points
         ArrayList<Point> curveSamples = getCurveSamplePoints(points, CURVE_SAMPLES);
+
+        // Generate Animated Point
+        Point animatedPoint;
+        if (SHOW_ANIMATED_POINT) animatedPoint = getCurveAnimatedPoint();
         
         // Draw Interpolated Curve
         graphics.setColor(NEW_POINT_COLOR);
@@ -101,6 +116,10 @@ class SplinePanel extends JPanel {
             drawSmallPoint(graphics, point);
         }
 
+        // Draw Animated Point
+        graphics.setColor(ANIMATED_POINT_COLOR);
+        if (SHOW_ANIMATED_POINT) drawPoint(graphics, animatedPoint);
+
         // Draw Boundary Points
         graphics.setColor(END_POINT_COLOR);
         drawPoint(graphics, getFirstPoint());
@@ -112,6 +131,7 @@ class SplinePanel extends JPanel {
         graphics.drawString("Control Points: " + points.size(), 16, getHeight() - 50);
         graphics.drawString("Curve Samples: " + CURVE_SAMPLES, 16, getHeight() - 20);
 
+        if (SHOW_ANIMATED_POINT) repaint();
     }
 
 
@@ -130,6 +150,16 @@ class SplinePanel extends JPanel {
         }
 
         return newPoints;
+    }
+
+    private Point getCurveAnimatedPoint() {
+
+        // Declare Local Variables
+        long time = (new Date()).getTime();
+        double factor = ((time - startTime) % LOOP_LENGTH) / (double) LOOP_LENGTH;
+
+        // Return Animated Point
+        return splineInterpolator.getPoint(factor);
     }
 
     private Point getFirstPoint() {
