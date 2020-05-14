@@ -37,7 +37,7 @@ class SplinePanel extends JPanel {
     private static final int POINT_SELECTION_RANGE = 20;
     private static final int POINT_OFFSET = 0;
     private static final int BACKGROUND_LIGHT = 255;
-    private static final int BACKGROUND_DARK = 235;
+    private static final int BACKGROUND_DARK = 230;
     private static final int BACKGROUND_STRIP_HEIGHT = 20;
     private static final Color LINE_COLOR = new Color(210, 210, 210);
     private static final Color END_POINT_COLOR = new Color(80, 130, 255);
