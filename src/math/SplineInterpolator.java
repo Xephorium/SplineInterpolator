@@ -14,6 +14,7 @@ import java.util.ArrayList;
  *
  * Post: https://math.stackexchange.com/questions/43947/casteljaus-algorithm-practical-example
  * De Casteljau's Algorithm: https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm
+ * Visualization: https://www.youtube.com/watch?v=YATikPP2q70
  *
  *   In the process of reading up on the math theory behind spline calculation, this UCLA paper
  * was also extremely helpful: https://www.math.ucla.edu/~baker/149.1.02w/handouts/dd_splines.pdf
